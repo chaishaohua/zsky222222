@@ -1,6 +1,6 @@
 #!/bin/sh
 #By 我本戏子 2017.7
-cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
+#1.1 解决部分主机无法安装pip和redis的问题
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
 systemctl stop iptables.service  
@@ -38,6 +38,10 @@ EOF
 echo ulimit -HSn 65536 >> /etc/rc.local
 echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
+yum -y install git 
+cd /root/
+git  clone https://github.com/chaishaohua/zsky.git
+cd zsky
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install psmisc net-tools lsof epel-release
 yum -y install python-pip
@@ -48,10 +52,6 @@ pip install -r requirements.txt
 #wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 #yum clean metadata
 #yum makecache
-yum -y install git 
-cd /root/zsky
-mkdir uploads
-cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
 systemctl start redis.service
@@ -71,16 +71,15 @@ systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
-mkdir uploads
 #启动后端gunicorn+gevent,开启日志并在后台运行
 nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&  
-#启动爬虫,开启日志并在后台运行
-nohup python simdht_worker.py >/root/zsky/spider.log 2>&1& 
+#启动爬虫并在后台运行
+nohup python simdht_worker.py >/dev/zero 2>&1& 
 #启动supervisor
 supervisord -c /root/zsky/zskysuper.conf
 #编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
-git clone https://github.com/wenguonideshou/sphinx-jieba.git
+git clone https://github.com/c4ys/sphinx-jieba
 cd sphinx-jieba
 git submodule update --init --recursive
 ./configure --prefix=/usr/local/sphinx-jieba
@@ -102,13 +101,13 @@ echo "systemctl start  mariadb.service" >> /etc/rc.d/rc.local
 echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
 echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
 echo "cd /root/zsky/" >> /etc/rc.d/rc.local
-echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.d/rc.local
+echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
 echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
 echo "supervisord -c /root/zsky/zskysuper.conf" >> /etc/rc.d/rc.local
-#设置计划任务,每天早上5点进行主索引
+#设置计划任务,每天早上5点进行主索引,每隔3小时进行增量索引并与主索引合并
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
 systemctl enable crond.service

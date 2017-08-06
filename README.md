@@ -2,13 +2,11 @@
 
 yum -y install git 
 
-git  clone https://github.com/wenguonideshou/zsky.git
+git  clone https://github.com/chaishaohua/zsky.git
 
 cd zsky
 
 sh zsky.sh
-
-此一键包只在centos7系统有效
 
 安装过程中会提示输入管理员用户名、密码、邮箱，输入后耐心等待即可访问http://IP
 

@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 # encoding: utf-8
+import sys  
+reload(sys)  
+sys.setdefaultencoding('utf8')
 """
 磁力搜索meta信息入库程序
-2017.7 我本戏子
+xiaoxia@xiaoxia.org  2015.6 Forked CreateChen's Project: https://github.com/CreateChen/simDownloader
+2017.7 我本戏子修复bug
+使用说明：
+pip install pymysql
+pip install DBUtils
 """
 
 import hashlib
@@ -23,8 +30,8 @@ from threading import Timer, Thread
 from time import sleep
 from collections import deque
 from Queue import Queue
+import pygeoip
 import pymysql
-from DBUtils.PooledDB import PooledDB
 
 try:
     raise
@@ -53,8 +60,13 @@ RE_JOIN_DHT_INTERVAL = 3
 TOKEN_LENGTH = 2
 
 MAX_QUEUE_LT = 30
-MAX_QUEUE_PT = 2000
+MAX_QUEUE_PT = 200
 
+geoip = pygeoip.GeoIP('GeoIP.dat')
+
+
+def is_ip_allowed(ip):
+    return geoip.country_code_by_addr(ip) not in ('CN','TW','HK')
 
 def entropy(length):
     return "".join(chr(randint(0, 255)) for _ in xrange(length))
@@ -267,21 +279,19 @@ class DHTServer(DHTClient):
         except KeyError:
             pass
 
-
 class Master(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.setDaemon(True)
         self.queue = Queue()
         self.metadata_queue = Queue()
+        from DBUtils.PooledDB import PooledDB
         self.pool = PooledDB(pymysql,50,host=DB_HOST,user=DB_USER,passwd=DB_PASS,db=DB_NAME,port=3306,charset="utf8mb4") #50为连接池里的最少连接数
-        self.dbconn = self.pool.connection()
+        self.dbconn = self.pool.connection() #以后每次需要数据库连接就用connection（）函数获取连接
+        #self.dbconn = mdb.connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, charset='utf8mb4')
+        #self.dbconn.autocommit(False)
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8mb4')
-        #self.dbconn = mdb.connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, charset='utf8')
-        #self.dbconn.autocommit(False)
-        #self.dbcurr = self.dbconn.cursor()
-        #self.dbcurr.execute('SET NAMES utf8')
         self.n_reqs = self.n_valid = self.n_new = 0
         self.n_downloading_lt = self.n_downloading_pt = 0
         self.visited = set()
@@ -295,6 +305,7 @@ class Master(Thread):
         if not data:
             return
         self.n_valid += 1
+
         save_metadata(self.dbcurr, binhash, address, start_time, data)
         self.n_new += 1
 
@@ -317,7 +328,7 @@ class Master(Thread):
 
             utcnow = datetime.datetime.utcnow()
             date = (utcnow + datetime.timedelta(hours=8))
-            date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second)
+            date = datetime.datetime(date.year, date.month, date.day ,date.hour ,date.minute ,date.second)
 
             # Check if we have this info_hash
             self.dbcurr.execute('SELECT id FROM search_hash WHERE info_hash=%s', (info_hash,))
@@ -325,7 +336,7 @@ class Master(Thread):
             if y:
                 self.n_valid += 1
                 # 更新最近发现时间，请求数
-                self.dbcurr.execute('UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (date, info_hash))
+                self.dbcurr.execute('UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (utcnow, info_hash))
             else:
                 if dtype == 'pt':
                     t = threading.Thread(target=simMetadata.download_metadata, args=(address, binhash, self.metadata_queue))
@@ -343,8 +354,8 @@ class Master(Thread):
                     'total_requests=total_requests+%s, valid_requests=valid_requests+%s, new_hashes=new_hashes+%s',
                     (date, self.n_new, self.n_reqs, self.n_valid, self.n_reqs, self.n_valid, self.n_new))
                 self.dbconn.commit()
-                #print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(), 
-                #print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt, 
+                print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(), 
+                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt, 
                 self.n_reqs = self.n_valid = self.n_new = 0
 
     def log_announce(self, binhash, address=None):
@@ -352,6 +363,8 @@ class Master(Thread):
 
     def log_hash(self, binhash, address=None):
         if not lt:
+            return
+        if is_ip_allowed(address[0]):
             return
         if self.n_downloading_lt < MAX_QUEUE_LT:
             self.queue.put([address, binhash, 'lt'])
@@ -382,3 +395,5 @@ if __name__ == "__main__":
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
     dht.start()
     dht.auto_send_find_node()
+
+

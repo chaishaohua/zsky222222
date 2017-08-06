@@ -1,4 +1,4 @@
-bencode.py==1.2.0
+pygeoip==0.3.2
 Flask_Migrate==2.0.4
 Flask_Admin==1.5.0
 Flask==0.12.2
@@ -13,6 +13,7 @@ Werkzeug==0.12.2
 Flask_BabelEx==0.9.3
 Flask_WTF==0.14.2
 Flask_Login==0.4.0
+Flask_Moment==0.5.1
 DBUtils==1.2
 gunicorn==19.7.1
 gevent==1.2.2
