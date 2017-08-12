@@ -6,20 +6,33 @@ cd zsky&&sh zsky.sh
 
 
 运行爬虫
+
 cd /root/zsky
+
 nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&
+
+
 杀死爬虫
+
 ps -ef|grep simdht_worker.py|grep -v grep|awk '{print $2}'|xargs kill -9
+
+
 重启爬虫
+
 ps -ef|grep simdht_worker.py|grep -v grep|awk '{print $2}'|xargs kill -9
+
 cd /root/zsky
+
 nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&
+
 
 
 立即重启
+
 shutdown -r now
 
 查看机器配置
+
 wget -qO- bench.sh     |bash
 
 是否有Swap
