@@ -73,24 +73,23 @@ cd /root/zsky
 #启动gunicorn开启日志并在后台运行
 nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:8000 -w 4 --reload>/dev/zero 2>&1&  
 #运行爬虫并在后台运行
-nohup python simdht_worker.py >/root/zsky/spider.log 2>&1& 
+nohup python simdht_worker.py >/dev/zero 2>&1& 
 supervisord -c /root/zsky/zskysuper.conf
-#编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
-git clone https://github.com/wenguonideshou/sphinx-jieba.git
+git clone https://github.com/c4ys/sphinx-jieba
 cd sphinx-jieba
-git clone https://github.com/wenguonideshou/cppjieba.git
+git submodule update --init --recursive
 ./configure --prefix=/usr/local/sphinx-jieba
-\cp -r cppjieba/include/cppjieba src/ 
-\cp -r cppjieba/deps/limonp src/ 
+cp -r cppjieba/include/cppjieba src/ 
+cp -r cppjieba/deps/limonp src/ 
 make install
-\cp -r cppjieba/dict/* /usr/local/sphinx-jieba/etc/ 
+cp -r cppjieba/dict/* /usr/local/sphinx-jieba/etc/ 
 cd /usr/local/sphinx-jieba/
-\cp etc/jieba.dict.utf8 etc/xdictjieba.dict.utf8
-\cp etc/user.dict.utf8 etc/xdictuser.dict.utf8
-\cp etc/hmm_model.utf8 etc/xdicthmm_model.utf8
-\cp etc/idf.utf8 etc/xdictidf.utf8
-\cp etc/stop_words.utf8 etc/xdictstop_words.utf8
+cp etc/jieba.dict.utf8 etc/xdictjieba.dict.utf8
+cp etc/user.dict.utf8 etc/xdictuser.dict.utf8
+cp etc/hmm_model.utf8 etc/xdicthmm_model.utf8
+cp etc/idf.utf8 etc/xdictidf.utf8
+cp etc/stop_words.utf8 etc/xdictstop_words.utf8
 /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film --rotate
 /usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf
 #开机自启动
@@ -114,4 +113,3 @@ echo '0 5 * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf fi
 crontab /tmp/crontab.bak
 echo '当前进程运行状态:'
 supervisorctl -c /root/zsky/zskysuper.conf status
-ps -xH|grep simdht|grep -v grep|wc -l
