@@ -158,9 +158,25 @@ def load_user(id):
 @app.route('/',methods=['GET','POST'])
 #@cache.cached(60*60*24)
 def index():
-    keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
-    form=SearchForm()
-    return render_template('index.html',form=form,keywords=keywords)
+    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    totalsql = 'select count(*) from film'    #总数据
+    curr.execute(totalsql)
+    totalcounts=curr.fetchall()
+    total = int(totalcounts[0]['count(*)'])
+    curr.close()
+    conn.close()
+    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    keywordsgetsql= 'SELECT * FROM search_keywords WHERE id >= ((SELECT MAX(id) FROM search_keywords)-(SELECT MIN(id) FROM search_keywords)) * RAND() + (SELECT MIN(id) FROM search_keywords)  LIMIT 25'      #首页随机调用关键词
+    currzsky.execute(keywordsgetsql)
+    randkeywords=currzsky.fetchall()
+    currzsky.close()
+    connzsky.close()
+    keywords = Search_Keywords.query.order_by(Search_Keywords.order).limit(20)
+    tags = Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    form = SearchForm()
+    return render_template('index.html',form=form,randkeywords=randkeywords,total=total,tags=tags)
 
 
 def make_cache_key(*args, **kwargs):
@@ -179,7 +195,7 @@ def search():
         return redirect(url_for('index'))
     return redirect(url_for('search_results',query=form.search.data))
 
-@app.route('/main-search-kw-<query>.html',methods=['GET','POST'])
+@app.route('/govbt/search_<query>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results(query=None):
     connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
@@ -202,17 +218,24 @@ def search_results(query=None):
     counts=int(resultcounts[0]['Value'])
     curr.close()
     conn.close()
+    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    keywordsgetsql= 'SELECT * FROM search_keywords WHERE id >= ((SELECT MAX(id) FROM search_keywords)-(SELECT MIN(id) FROM search_keywords)) * RAND() + (SELECT MIN(id) FROM search_keywords)  LIMIT 50'      #搜索页面随机调用关键词
+    currzsky.execute(keywordsgetsql)
+    randkeywords=currzsky.fetchall()
+    currzsky.close()
+    connzsky.close()
     pages=(counts+19)/20
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
     form.search.data=query
-    return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+    return render_template('list.html',form=form,query=query,pages=pages,page=page,randkeywords=randkeywords,hashs=result,counts=counts,tags=tags)
 
 
-@app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
+@app.route('/govbt/search_<query>-px-2.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results_bylength(query):
-    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
     currzsky.execute(taginsertsql,query)
@@ -220,9 +243,46 @@ def search_results_bylength(query):
     currzsky.close()
     connzsky.close()
     page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    curr.execute(querysql,[query,(page-1)*20])
+    result=curr.fetchall()
+    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    curr.close()
+    conn.close()
+    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    keywordsgetsql= 'SELECT * FROM search_keywords WHERE id >= ((SELECT MAX(id) FROM search_keywords)-(SELECT MIN(id) FROM search_keywords)) * RAND() + (SELECT MIN(id) FROM search_keywords)  LIMIT 30'        #搜索页面调用随机关键词
+    currzsky.execute(keywordsgetsql)
+    randkeywords=currzsky.fetchall()
+    currzsky.close()
+    connzsky.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    form=SearchForm()
+    form.search.data=query
+    return render_template('list_bylength.html',form=form,query=query,randkeywords=randkeywords,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+
+
+@app.route('/govbt/search_<query>-px-2.html',methods=['GET','POST'])
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
+def search_results_bycreate_time(query):
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
+    page=request.args.get('page',1,type=int)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -236,10 +296,40 @@ def search_results_bylength(query):
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
     form.search.data=query
-    return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+    return render_template('list_bycreate_time.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
-@app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
+@app.route('/govbt/search_<query>-px-2.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
+def search_results_byrequests(query):
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
+    page=request.args.get('page',1,type=int)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    curr.execute(querysql,[query,(page-1)*20])
+    result=curr.fetchall()
+    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    curr.close()
+    conn.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    form=SearchForm()
+    form.search.data=query
+    return render_template('list_byrequests.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+
+
+@app.route('/govbt<id>.html',methods=['GET','POST'])
+@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def detail(id):
     conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
@@ -252,9 +342,20 @@ def detail(id):
     if not result:
         return redirect(url_for('index'))        
     fenci_list=jieba.analyse.extract_tags(result['name'], 8)
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    keywordinsertsql = 'REPLACE INTO search_keywords(keyword) VALUES(%s)'
+    for x in fenci_list:
+        currzsky.execute(keywordinsertsql,x)
+    connzsky.commit()
+    keywordsgetsql= 'SELECT * FROM search_keywords WHERE id >= ((SELECT MAX(id) FROM search_keywords)-(SELECT MIN(id) FROM search_keywords)) * RAND() + (SELECT MIN(id) FROM search_keywords)  LIMIT 150'      #内容页面随机调用关键词
+    currzsky.execute(keywordsgetsql)
+    randkeywords=currzsky.fetchall()
+    currzsky.close()
+    connzsky.close()
     form=SearchForm()
-    return render_template('detail.html',form=form,tags=tags,hash=result,fenci_list=fenci_list)
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    return render_template('detail.html',form=form,tags=tags,hash=result,randkeywords=randkeywords,fenci_list=fenci_list)
 
 
 @app.route('/robots.txt')
@@ -332,7 +433,7 @@ class UserView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('.login_view'))
 
-admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),base_template='admin/my_master.html')
+admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/zsky'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(UserView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
@@ -363,5 +464,3 @@ def create_user(name,password,email):
 
 if __name__ == '__main__':
     manager.run()
-
-
