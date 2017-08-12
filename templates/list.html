@@ -3,11 +3,13 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>{{query}} - 搜索结果 - 纸上烤鱼磁力链接,磁力搜索</title>
-<meta name="keywords" content=""/>
-<meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
+<title>为您找到关于{{query}} 的BT,迅雷下载链接一共有 {{counts}} 条,谷歌,百度,360,soso,yahoo,全球搜索排行榜{%for k in randkeywords%}{{k.keyword}},{%endfor%},188BT是世界第一，也是最大的BT磁力下载搜索社区</title>
+<meta name="keywords" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,列如{{query}}的磁力链接在线云播,迅雷链接下载,QQ旋风链接下载_同时提供{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等百度和各大电视台黄金剧场热门影视BT磁力,QQ旋风离线,迅雷离线,百度云盘离线下载">
+<meta name="description" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,列如：{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等等...">
 <meta name="viewport" content="width=device-width"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
+<script src="https://cdn.bootcss.com/moment.js/2.18.1/locale/zh-cn.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.18.1/moment.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
 <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
@@ -35,32 +37,29 @@
 <a href="#"><b>相关度</b></a>
 <a href="{{url_for('search_results_bylength',query=query)}}">文件大小</a>
 <a href="{{url_for('search_results_bycreate_time',query=query)}}">创建时间</a>
-<a href="{{url_for('search_results_byrequests',query=query)}}">热度</a>
+<a href="{{url_for('search_results_byrequests',query=query)}}">热度</a>>
 </div>
 <div id="content">
 <div id="wall">
 <div class="search-statu">
-<span>共找到 {{counts}} 条关于 {{query}} 的结果</span>
+<span>找到 {{counts}} 条关于 {{query}} 的结果<br></span>
 </div>
 <div class="adsense" style="position:relative"></div>
 <div class="col-md-8">
 {% for hash in hashs %}  
 <div class="search-item detail-width">
 <div class="item-title">
-<h3><a title="{{ hash.name }}" href="{{url_for('detail',id=hash.id)}}" target="_blank">{{ hash.name }}</a></h3>
+<h3><a title="{{hash['name'].encode('utf8')}}" href="{{url_for('detail',id=hash.id)}}" >{{hash['name'].encode('utf8')}}</a></h3>
 </div>
-<div class="item-list">
-</div>
+  <div class="item-list"></div>
 <div class="item-bar">
-<span class="cpill fileType1">{{hash['category']}}</span>
-<span>创建时间：<b>{{ hash['create_time']|todate }}</b></span>
-<span>文件大小：<b>
+<span>时间：<b>{{ hash['last_seen']|todate }}</b></span>
+<span>大小：<b>
 {% if hash['length']>1073741824 %}
 <b class="cpill yellow-pill">{{(hash['length']/1073741824)|round(2)}}G</b>
 {% else %}<b class="cpill blue-pill">{{(hash['length']/1048576)|round(2)}}M</b>
 {%endif%}</span>
-<span>热度：<b>{{hash['requests']}}</b></span>
-<span><img src="{{ url_for('static', filename='img/link.png') }}"  /><a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" >磁力链接</a></span>
+<span>{{hash['requests']}} 人撸过</span>
 </div>
 </div>
 {% endfor %} 
@@ -103,11 +102,10 @@
 </div>
 </div>
 <div class="col-md-2">
-<div class="search-notice sidebar-width">电影磁力链接,电影bt种子下载,电影迅雷下载相关资源由用户搜索指令自动获取，结果来源于网络，本站不存储任何资料，亦不承担任何责任，请于24小时内删除！</div>
+<div class="search-notice sidebar-width">谷歌,百度,360,soso,yahoo,全球搜索排行榜</div>
 <div id="latest-search" class="sidebar-width">
-<span class="latest-desc">大家对这些感兴趣：</span>
-{%for tag in tags%}
-<span><a href="{{url_for('search_results',query=tag.tag)}}">{{tag.tag}}</a></span>
+{%for k in randkeywords%}
+<span><a href="{{url_for('search_results',query=k.keyword)}}"><b class="cpill blue-pill">{{k.keyword}}</b></a></span>
 {%endfor%}
 </div>
 </div>
@@ -117,7 +115,7 @@
 </div>
 </div>
 <div class="footer">
-<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a></span>
+<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> |  <span><script language="javascript" src="http://count5.51yes.com/click.aspx?id=50389886&logo=12" charset="gb2312"></script></span>
 </div>
 <script charset="gbk" type="text/javascript" src="http://www.baidu.com/js/opensug.js"></script>
 <script type="text/javascript">

@@ -3,10 +3,10 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>{{hash['name'].encode('utf8')}} - 纸上烤鱼,磁力链接,磁力搜索</title>
-<meta name="keywords" content=""/>
-<meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
-<meta name="viewport" content="width=device-width"/>
+<title>{{hash['name']}}免费下载,{{hash['name'].encode('utf8')}}bt种子免费下载,{{hash['name'].encode('utf8')}}1080P,{{hash['name'].encode('utf8')}}蓝光高清,188BT是世界第一，也是最大的BT磁力搜索网站</title>
+<meta name="keywords" content="bt下载论坛提供{{hash['name']}}的磁力链接在线云播,迅雷链接下载,QQ旋风链接下载_同时提供{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等百度和各大电视台黄金剧场热门影视BT磁力,QQ旋风离线,迅雷离线,百度云盘离线下载     /">
+<meta name="description" content="{{hash.name}}最新资讯,{{hash.name}}免费下载,{{hash.name}}bt种子免费下载,{{hash.name}}1080P,{{hash.name}}蓝光高清">
+<meta name="viewport" content="width=device-width" />
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
 <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
@@ -55,35 +55,48 @@
 </tr>
 </tbody>
 </table>
+  
+<div class="detail-panel detail-width">
+<div class="panel-header">谷歌,百度,360,soso,yahoo,全球搜索排行榜</div>
+<div class="panel-body">
+{%for k in randkeywords%}
+<a href="{{url_for('search_results',query=k.keyword)}}">{{k.keyword}}&nbsp;&nbsp;</a>
+{%endfor%}
+</div>
+</div>
+  
 <div class="detail-panel detail-width">
 <div class="panel-header">磁力链接</div>
 <div class="panel-body">
 <a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}">magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}</a>
 </div>
 </div>
+
 <div class="detail-panel detail-width">
-<div class="panel-header">你可能喜欢</div>
+<div class="panel-header">关键词标签：</div>
 <div class="panel-body">
 {%for fenci in fenci_list%}
 <a href="{{url_for('search_results',query=fenci)}}">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
 {%endfor%}
 </div>
 </div>
+
 <div class="detail-panel detail-width">
 <div class="panel-header">友情提示</div>
 <div class="panel-body">
-<p>{{hash.name}}</p>
+<p>{{hash.name}}最新资讯,{{hash.name}}免费下载,{{hash.name}}bt种子免费下载,{{hash.name}}1080P,{{hash.name}}蓝光高清</p>
 <p>本站已经屏蔽了99%的非法链接，若本链接侵犯你的权利，请联系下面的邮箱进行举报！ </p>
 <p>亲，你造吗？将网页分享给您的基友，下载的人越多速度越快哦！</p>
 </div>
 </div>
+
 <div class="detail-panel detail-width">
 <div class="panel-header">
 投诉异议
 </div>
 <div class="panel-body">
 <p>
-版权投诉/Complain Email：<a class="__cf_email__"  >hao123@hao123.com</a>
+版权投诉 Email：<a class="__cf_email__"  >tousu@baidu.com</a>
 </p>
 </div>
 </div>
@@ -94,7 +107,7 @@
 </div>
 </div>
 <div class="footer">
-<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a></span>
+<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a> | <script language="javascript" src="http://count5.51yes.com/click.aspx?id=50389886&logo=12" charset="gb2312"></script></span>
 </div>
 
 <script charset="gbk" type="text/javascript" src="//www.baidu.com/js/opensug.js"></script>

@@ -3,16 +3,15 @@
 <head>
 <meta name="baidu-site-verification" content="P1QzNDXk6x"/>
 <meta charset="utf-8"/>
-<title>纸上烤鱼 - 种子搜索网站,最快的磁力链接搜索引擎</title>
-<meta name="keywords" content=""/>
-<meta name="description" content="纸上烤鱼种子搜索神器,一个有兔子般速度的种子搜索网站,为您提供高效精准的磁力链接搜索服务!"/>
+<title>188BT提供全世界24小时以内搜索排行榜上的bt种子下载</title>
+<meta name="keywords" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,提供{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等百度和各大电视台黄金剧场热门影视BT磁力,QQ旋风离线,迅雷离线,百度云盘离线下载">
+<meta name="description" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,列如：{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等等...">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='ciliss_apple.jpg') }}"/>
-
 </head>
 <body>
 <div id="wrapper">
@@ -40,10 +39,11 @@
 </form>
 <div class="info-box">
 <ul>
-{%for k in keywords%}
+{%for k in randkeywords%}
 <li><a href="{{url_for('search_results',query=k.keyword)}}">{{k.keyword}}</a></li>
 {%endfor%}
 </ul>
+
 <p style="color:#000000; margin-top:10px;">总收录{{total}}条数据</p>
 </div>
 </div>
