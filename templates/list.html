@@ -8,10 +8,10 @@
 <meta name="description" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,列如：{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等等...">
 <meta name="viewport" content="width=device-width"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
-<script src="https://cdn.bootcss.com/moment.js/2.18.1/locale/zh-cn.js"></script>
-<script src="https://cdn.bootcss.com/moment.js/2.18.1/moment.js"></script>
-<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
-<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+<script src="//cdn.bootcss.com/moment.js/2.18.1/locale/zh-cn.js"></script>
+<script src="//cdn.bootcss.com/moment.js/2.18.1/moment.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+<link rel="shortcut icon" type="image/x-icon" href="http://dg12.qiniudn.com/favicon.ico"/>
 </head>
 <body>
 <div id="wrapper">
@@ -26,7 +26,7 @@
 </div>
 <div class="header-div">
 <form class="search-form"  action="{{url_for('search')}}" method="POST">
-<a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
+<a href="/" ><img src="http://dg12.qiniudn.com/btlogo_s.png"  class="nav-logo"/></a>
 {{form.hidden_tag()}}
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}

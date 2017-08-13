@@ -8,7 +8,7 @@
 <meta name="description" content="{{hash.name}}最新资讯,{{hash.name}}免费下载,{{hash.name}}bt种子免费下载,{{hash.name}}1080P,{{hash.name}}蓝光高清">
 <meta name="viewport" content="width=device-width" />
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
-<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+<link rel="shortcut icon" type="image/x-icon" href="http://dg12.qiniudn.com/favicon.ico"/>
 </head>
 <body>
 <div id="wrapper">
@@ -23,7 +23,7 @@
 </div>
 <div class="header-div">
 <form class="search-form"  action="{{url_for('search')}}" method="POST">
-<a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
+<a href="/" ><img src="//dg12.qiniudn.com/btlogo_s.png"  class="nav-logo"/></a>
 {{form.hidden_tag()}}
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}

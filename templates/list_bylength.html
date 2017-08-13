@@ -3,12 +3,12 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>{{query}} - 搜索结果 - 纸上烤鱼磁力链接,磁力搜索</title>
-<meta name="keywords" content=""/>
-<meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
+<title>为您找到关于{{query}} 的BT,迅雷下载链接一共有 {{counts}} 条,谷歌,百度,360,soso,yahoo,全球搜索排行榜{%for k in randkeywords%}{{k.keyword}},{%endfor%},188BT是世界第一，也是最大的BT磁力下载搜索社区</title>
+<meta name="keywords" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,列如{{query}}的磁力链接在线云播,迅雷链接下载,QQ旋风链接下载_同时提供{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等百度和各大电视台黄金剧场热门影视BT磁力,QQ旋风离线,迅雷离线,百度云盘离线下载">
+<meta name="description" content="188BT提供全世界24小时以内搜索排行榜上的bt种子下载,列如：{%for k in randkeywords%}{{k.keyword}}，{%endfor%}等等...">
 <meta name="viewport" content="width=device-width"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
-<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+<link rel="shortcut icon" type="image/x-icon" href="http://dg12.qiniudn.com/favicon.ico"/>
 </head>
 <body>
 <div id="wrapper">
@@ -23,7 +23,7 @@
 </div>
 <div class="header-div">
 <form class="search-form"  action="{{url_for('search')}}" method="POST">
-<a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
+<a href="/" ><img src="http://dg12.qiniudn.com/btlogo_s.png"  class="nav-logo"/></a>
 {{form.hidden_tag()}}
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
