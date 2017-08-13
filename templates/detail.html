@@ -29,7 +29,6 @@
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
 </div>
-
 <div id="content">
 <div id="wall">
 <h2>{{hash['name'].encode('utf8')}}</h2>
@@ -55,16 +54,14 @@
 </tr>
 </tbody>
 </table>
-  
 <div class="detail-panel detail-width">
-<div class="panel-header">谷歌,百度,360,soso,yahoo,全球搜索排行榜</div>
+<div class="panel-header">全球热门BT种子搜索排行榜</div>
 <div class="panel-body">
 {%for k in randkeywords%}
 <a href="{{url_for('search_results',query=k.keyword)}}">{{k.keyword}}&nbsp;&nbsp;</a>
 {%endfor%}
 </div>
 </div>
-  
 <div class="detail-panel detail-width">
 <div class="panel-header">磁力链接</div>
 <div class="panel-body">
@@ -73,7 +70,7 @@
 </div>
 
 <div class="detail-panel detail-width">
-<div class="panel-header">关键词标签：</div>
+<div class="panel-header">{{hash['name']}}相关关键词：</div>
 <div class="panel-body">
 {%for fenci in fenci_list%}
 <a href="{{url_for('search_results',query=fenci)}}">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
@@ -89,27 +86,17 @@
 <p>亲，你造吗？将网页分享给您的基友，下载的人越多速度越快哦！</p>
 </div>
 </div>
-
 <div class="detail-panel detail-width">
 <div class="panel-header">
 投诉异议
 </div>
 <div class="panel-body">
-<p>
-版权投诉 Email：<a class="__cf_email__"  >tousu@baidu.com</a>
-</p>
-</div>
-</div>
-</div>
-<div class="push">
-</div>
-</div>
-</div>
-</div>
+<p>版权投诉 Email：<a class="__cf_email__"  >tousu@baidu.com</a></p>
+</div></div></div>
+<div class="push"></div></div></div></div>
 <div class="footer">
-<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a> | <script language="javascript" src="http://count5.51yes.com/click.aspx?id=50389886&logo=12" charset="gb2312"></script></span>
+<script language="javascript" src="http://count5.51yes.com/click.aspx?id=50389886&logo=12" charset="gb2312"></script></span>
 </div>
-
 <script charset="gbk" type="text/javascript" src="//www.baidu.com/js/opensug.js"></script>
 <script type="text/javascript">
         var params = { "XOffset": 0, "YOffset": 0, "fontColor": "#444", "fontColorHI": "#000", "fontSize": "16px", "fontFamily": "arial", "borderColor": "gray", "bgcolorHI": "#ebebeb", "sugSubmit": false };
