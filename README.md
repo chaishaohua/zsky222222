@@ -31,9 +31,9 @@ nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&
 
 shutdown -r now
 
-查看机器配置
+一键检测服务器配置、IO、下载速度
 
-wget -qO- bench.sh     |bash
+wget -qO- bench.sh | bash
 
 是否有Swap
 
