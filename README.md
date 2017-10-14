@@ -65,6 +65,13 @@ cd /root/zsky
 
 sh zsky-reboot.sh
 
+如何导入旧数据
+
+mysql
+
+use zsky;
+
+source /root/search_tags.sql
 
 空密码登入数据库
 
